@@ -22,6 +22,9 @@ class animal(object):
       self.state = 'Сытый'
       print(self.name, 'наелся!')
 
+  def speak(self):
+    print(self.sound)
+
 class cow(animal):
   """Корова"""
   satiety = 0 #л
