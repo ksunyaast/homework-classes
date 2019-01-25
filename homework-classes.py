@@ -1,8 +1,13 @@
 # Задача№1
-class animal(object):
+from abc import ABC, abstractmethod
+
+
+class Animal(object):
   """Домашнее животное"""
   satiety = 0 #кг
   state = 'Голодный'
+  satiety_max = 5 #кг
+  sound = 'Я не говорю!'
 
   def __init__(self, name, weight):
     self.name = name
@@ -22,10 +27,16 @@ class animal(object):
       self.state = 'Сытый'
       print(self.name, 'наелся!')
 
+  @abstractmethod
+  def collect(self):
+    """Сбор продукта с животного"""
+
   def speak(self):
+    """Животное издает звук"""
     print(self.sound)
 
-class cow(animal):
+
+class Cow(Animal):
   """Корова"""
   satiety = 0 #л
   satiety_max = 20 #кг
@@ -33,7 +44,7 @@ class cow(animal):
   dugs_max = 4 #вымя
   sound = 'Мууу!'
 
-  def milk(self, dug):
+  def collect(self, dug):
     """Дойка молока"""
     if self.state == 'Сытый':
       self.milk_dugs += dug
@@ -46,13 +57,15 @@ class cow(animal):
     else:
       print('{} нельзя доить пока не покормили!'.format(self.name))
 
-class goat(cow):
+
+class Goat(Cow):
   """Коза"""
   satiety_max = 15#кг
   dugs_max = 2 #вымя
   sound = 'Меее!'
 
-class sheep(animal):
+
+class Sheep(Animal):
   """Овечка"""
   satiety_max = 18 #кг
   all_wool = 0 #кг
@@ -60,7 +73,7 @@ class sheep(animal):
   sound = 'Беее!'
   wool_status = 'Лохматая'
 
-  def cut(self, wool):
+  def collect(self, wool):
     """Стрижка"""
     if self.state == 'Голодный':
       self.all_wool += wool
@@ -73,14 +86,15 @@ class sheep(animal):
     else:
       print(self.name, 'нельзя стричь на полный желудок!')
 
-class goose(animal):
+
+class Goose(Animal):
   """Гусь"""
   satiety_max = 5 #кг
   sound = 'Га Га Га!'
   eggs_status = 'Не собраны'
   eggs = 0
 
-  def pick_up_eggs(self, found_eggs):
+  def collect(self, found_eggs):
     """Сборка яиц"""
     if self.eggs_status == 'Не собраны':
       self.eggs += found_eggs
@@ -92,27 +106,29 @@ class goose(animal):
     else:
       print ('Уже собрали')
 
-class chicken(goose):
+
+class Chicken(Goose):
   """Курица"""
   satiety_max = 3 #кг
   sound = 'Ко Ко Ко!'
 
-class duck(goose):
+
+class Duck(Goose):
   """Утка"""
   satiety_max = 4 #кг
   sound = 'Кря Кря Кря!'
 
 # Задача№2
-goose_1 = goose('Серый', 3)
-goose_2 = goose('Белый', 3.5)
-cow_1 = cow('Манька', 450)
-sheep_1 = sheep('Барашек', 50)
-sheep_2 = sheep('Кудрявый', 75)
-chicken_1 = chicken('Ко-Ко', 0.7)
-chicken_2 = chicken('Кукареку', 0.85)
-goat_1 = goat('Рога', 55)
-goat_2 = goat('Копыта', 63)
-duck_1 = duck('Кряква', 1.5)
+goose_1 = Goose('Серый', 3)
+goose_2 = Goose('Белый', 3.5)
+cow_1 = Cow('Манька', 450)
+sheep_1 = Sheep('Барашек', 50)
+sheep_2 = Sheep('Кудрявый', 75)
+chicken_1 = Chicken('Ко-Ко', 0.7)
+chicken_2 = Chicken('Кукареку', 0.85)
+goat_1 = Goat('Рога', 55)
+goat_2 = Goat('Копыта', 63)
+duck_1 = Duck('Кряква', 1.5)
 
 goose_1.feeding(5)
 goose_2.feeding(2)
@@ -125,19 +141,21 @@ goat_1.feeding(20)
 goat_2.feeding(9)
 duck_1.feeding(4)
 print('')
-goose_1.pick_up_eggs(6)
-goose_2.pick_up_eggs(3)
-cow_1.milk(4)
-sheep_1.cut(6)
-sheep_2.cut(8)
-chicken_1.pick_up_eggs(1)
-chicken_2.pick_up_eggs(0)
-goat_1.milk(1)
-goat_2.milk(2)
-duck_1.pick_up_eggs(3)
+goose_1.collect(6)
+goose_2.collect(3)
+cow_1.collect(4)
+sheep_1.collect(6)
+sheep_2.collect(8)
+chicken_1.collect(1)
+chicken_2.collect(0)
+goat_1.collect(1)
+goat_2.collect(2)
+duck_1.collect(3)
 
 # Задача№3
-animal_list = [goose_1.__dict__, goose_2.__dict__, cow_1.__dict__, sheep_1.__dict__, sheep_2.__dict__, chicken_1.__dict__, chicken_2.__dict__, goat_1.__dict__, goat_2.__dict__, duck_1.__dict__]
+animal_list = [goose_1.__dict__, goose_2.__dict__, cow_1.__dict__, sheep_1.__dict__,
+sheep_2.__dict__, chicken_1.__dict__, chicken_2.__dict__, goat_1.__dict__, goat_2.__dict__, duck_1.__dict__]
+
 
 def sum_weight(animal_list):
   """Определение общего веса всех животных"""
@@ -146,17 +164,11 @@ def sum_weight(animal_list):
     sum_weight += animal['weight']
   print('Вес всех животных = {}кг.'.format(round(sum_weight, 2)))
 
+
 def heaviest_weight(animal_list):
-  weight_list = list()
-  for animal in animal_list:
-    weight_list.append(animal['weight'])
-  sorted(weight_list)
-  for animal in animal_list:
-    if animal['weight'] == sorted(weight_list)[-1]:
-      print('Самое тяжелое животное - {}, с весом {}кг.'.format(animal['name'], animal['weight']))
-      break
-  else:
-    print('Животного с таким весом нет!')
+  animal_list.sort(key=lambda anml: anml['weight'])
+  print('Самое тяжелое животное - {}, с весом {}кг.'.format(animal_list[-1]['name'], animal_list[-1]['weight']))
+
 print('')
 sum_weight(animal_list)
 heaviest_weight(animal_list)
